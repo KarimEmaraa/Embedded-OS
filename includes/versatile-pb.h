@@ -21,7 +21,7 @@ typedef volatile struct uart{
 	unsigned int const MIS;
 	unsigned int ICR;
 	unsigned int MACR;
-	unsigned int const reserved2[996];
+	unsigned int const reserved2[997];
 	unsigned int const UARTPeriphID0;
 	unsigned int const UARTPeriphID1;
 	unsigned int const UARTPeriphID2;
