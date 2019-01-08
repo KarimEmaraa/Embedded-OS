@@ -4,12 +4,11 @@ static inline void clcd_clearpx(unsigned int x, unsigned int y);
 static inline void clcd_setpx(unsigned int x, unsigned int y);
 
 unsigned int * const fb = (unsigned int * const)0x200000;; /*frame buffer pointer*/
-char const cursor = 127;
-unsigned int row = 0, col = 0, scrow_row = 4;
+char const cursor = 127; //cursor index
+unsigned int row = 0, col = 0;
 enum COLOR color;
 extern char fonts[];
-extern char _binary_font_start;
-static char tab[] = "0123456789ABCDEF";
+static unsigned char tab[] = "0123456789abcdef";
 
 void clcd_init(void)
 {
@@ -22,9 +21,6 @@ void clcd_init(void)
 	CLCD->UPBASE = (unsigned int)fb;
 	CLCD->IMSC = 0x82B;
 
-	  for (unsigned int x=0; x<640*480; x++)
-    		fb[x] = 0x0;    // clean screen; all pixels are BLACK
-
 #elif (WIDTH == 800)
 	SCR->OSC1 = 0x2CAC;		//Enable clock;
 	CLCD->Timing0 = 0x1313A4C4;
@@ -32,10 +28,10 @@ void clcd_init(void)
 	CLCD->Timing2 = 0x071F1800;	
 	CLCD->UPBASE = (unsigned int)fb;
 	CLCD->IMSC = 0x82B;
-
-	for(unsigned int x = 0; x < 800*600; x++)
-		fb[x] = 0x0;	// clean screen; all pixels are BLACK
 #endif
+
+	for(unsigned int x = 0; x < WIDTH*LENGTH; x++)
+		fb[x] = 0x0;	// clean screen; all pixels are BLACK
 
 }
 
@@ -47,7 +43,7 @@ void clcd_test(void)
   	for (unsigned int x = 212*480+1; x < (424*480); ++x)
   		fb[x] = 0x0000FF00;  //00BBGGRR
   	for (unsigned int x = 424*480+1; x < (640*480); ++x)
-  		fb[x] = 0x000000FF;  //00BBGGRR
+  		fb[x] = 0x000000Ff;  //00BBGGRR
 }
 
 void clcd_showbmp(unsigned char *img, unsigned int startRow, unsigned int startCol)
@@ -152,7 +148,7 @@ void clcd_displayString(unsigned char *s, unsigned int x, unsigned int y)
 
 void scroll(void)
 {
-	for(unsigned int i = scrow_row * 16 * WIDTH; i < WIDTH * LENGTH; i++)
+	for(unsigned int i = 64* WIDTH; i < (WIDTH * LENGTH); i++)
 	{
 		fb[i] = fb[i + WIDTH * 16];
 	}
@@ -176,49 +172,50 @@ void clcd_putCursor(void)
 }
 void clcd_putc(unsigned char c)
 {
-	clcd_clearCursor();
-	if(c == '\r')
+	//clcd_clearCursor();
+/*	if(c == '\r')
 	{
 		col = 0;
 		clcd_putCursor();
 		return;
-	}
-	else if( c == '\n')
+	}*/
+	if( c == '\n') //newline character
 	{
+		row++;
+		col = 0;
+		if(row >= 30)
+		{
+			row = 29;
+			scroll();
+		}
+		//clcd_putCursor();
+		return;
+	}
+	else if( c == '\b')
+	{
+	
+		if(col > 0)
+		{
+			col--;
+			//clcd_putCursor();
+		}
+		return;
+	}
+	
+	clcd_KdisplayChar(c, row , col);
+	col++;
+	if(col >= 80)
+	{
+		col = 0; 
 		row++;
 		if(row >= 30)
 		{
 			row = 29;
 			scroll();
 		}
-		clcd_putCursor();
-		return;
 	}
-	else if( c == '\b')
-	{
-		if(col > 0)
-		{
-			col--;
-			clcd_putCursor();
-		}
-		return;
-	}
-	else
-	{
-		clcd_KdisplayChar(c, row , col);
-		col++;
-		if(col >= 80)
-		{
-			col = 0; 
-			row++;
-			if(row >= 30)
-			{
-				row = 29;
-				scroll();
-			}
-		}
-		clcd_putCursor();
-	}
+	//clcd_putCursor();
+	
 }
 void clcd_puts( char * s)
 {
@@ -230,16 +227,18 @@ void clcd_puts( char * s)
 }
 void clcd_krpx(unsigned int x)
 {
-	char c;
+	unsigned char c;
   	if (x){
-     c = tab[x % 16];
-     clcd_krpx(x / 16);
+     	c = tab[x % 16];
+    	clcd_krpx(x / 16);
+		clcd_putc(c);
   	}
-  	clcd_putc(c);
+  	
 }
 void clcd_kprintx(unsigned int x)
 {
-	clcd_putc('0'); clcd_putc('x');
+	clcd_putc('0'); 
+	clcd_putc('x');
   	if (x==0)
     	clcd_putc('0');
   	else
@@ -247,12 +246,13 @@ void clcd_kprintx(unsigned int x)
 }
 void clcd_krpu(unsigned int x)
 {
-	char c;
+	unsigned char c;
   	if (x){
      	c = tab[x % 10];
      	clcd_krpu(x / 10);
+		clcd_putc(c);
   	}
-  	clcd_putc(c);	
+  		
 }
 void clcd_kprintu(unsigned int x)
 {
@@ -263,7 +263,7 @@ void clcd_kprintu(unsigned int x)
     	clcd_krpu(x);
 
 }
-void clcd_kprinti(unsigned int x)
+void clcd_kprinti(int x)
 {
 	if (x<0){
     	clcd_putc('-');
@@ -273,29 +273,29 @@ void clcd_kprinti(unsigned int x)
 }
 void clcd_kprintf(char * fmt, ...)
 {
-	int *ip;
- 	char *cp;
-  	cp = fmt;
-  	ip = (int *)&fmt + 1;
+	int *ip = (int *)&fmt + 1;
+ 	char *cp = fmt;
 
   	while(*cp){
+		//Normal char
     	if (*cp != '%'){
       		clcd_putc(*cp);
-      		if (*cp=='\n')
-				clcd_putc('\r');
       		cp++;
       		continue;
     	}
+		//format
 		cp++;
-		switch(*cp){
-			case 'c': clcd_putc((char)*ip);      break;
-			case 's': clcd_puts((char *)*ip);  break;
-			case 'd': clcd_kprinti(*ip);          break;
-			case 'u': clcd_kprintu(*ip);          break;
-			case 'x': clcd_kprintx(*ip);          break;
-    }
+		switch(*cp)
+		{
+			case 'c': clcd_putc((char)*ip);		break;
+			case 's': clcd_puts((char *)*ip);  	break;
+			case 'd': clcd_kprinti(*ip);        break;
+			case 'u': clcd_kprintu(*ip);        break;
+			case 'x': clcd_kprintx(*ip);        break;
+
+    	}
     	cp++; ip++;
-  }
+	}
 }
 
 

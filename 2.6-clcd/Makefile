@@ -35,7 +35,7 @@ INCLUDES = ../includes
 OBJS = ts.s\
 	main.c\
 	clcd.c\
-	font.c
+	font.c\
 
 # Compiler Flags and Defines
 
