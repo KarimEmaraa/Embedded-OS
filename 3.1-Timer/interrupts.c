@@ -1,6 +1,4 @@
 #include "versatile-pb.h"
-#include "clcd.h"
-#define printf clcd_kprintf
 
 void __attribute__((interrupt)) undef_handler(void) { while(1); }
 void __attribute__((interrupt)) swi_handler(void) { while(1); }
