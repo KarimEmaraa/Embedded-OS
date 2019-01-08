@@ -6,8 +6,8 @@ reset_handler:
 	LDR sp, =svc_stack_top 	//set SVC Mode stack as reset uses it 
 	BL  copy_vectors
 	BL init_sections	//init BSS
-	//Now going to IRQ Mode to setup it's sp
-	MSR cpsr, #0x92		//to IRQ Mode
+	//IRQ Mode to setup it's sp
+	MSR cpsr, #0x12		//to IRQ Mode
 	LDR sp, =irq_stack_top
 	MSR cpsr, 0x13		//go back to SVC Mode with Inter on
 	BL main

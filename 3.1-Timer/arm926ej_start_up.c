@@ -17,6 +17,6 @@ void init_sections(void)
 {
 	unsigned char * bss_start = &_bss_start;
 	unsigned char * bss_end = &_bss_end;
-	while(bss_start <= bss_end)
+	while(bss_start != bss_end)
 		*bss_start++ = 0;
 }
