@@ -1,7 +1,7 @@
 ## Description
 This is my step by step creating Embedded OS following ***Embedded and Real Time Operating Systems By KC Wang*** book.
-The book is using qemu for hardware simulation and using 2 development platforms **Realview-pbx-a9** and **Versatile-epb**, so i have created 2 header files describing peripherals used in modules for both platforms.
-You need to install **qemu-system-arm** and **gnu toolchain for arm**.
+Using **qemu-system-arm** for hardware simulation, **gnu toolchain for arm**  and  using 2 development platforms **Realview-pbx-a9** and **Versatile-epb**
+
 ## Details
 
 **makefile** contains * *MACHINE* * to select between the two developoment platforms.
