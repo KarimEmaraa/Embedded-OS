@@ -6,8 +6,8 @@
 /*Peripheral struct definitions*/
 typedef volatile struct uart{
 	unsigned int DR;
-	unsigned int DSR;
-	unsigned char reserved0[16];
+	unsigned int RSR;
+	unsigned int const reserved0[4];
 	unsigned int FR;
 	unsigned int const reserved1[1];
 	unsigned int LPR;
@@ -99,6 +99,7 @@ typedef volatile struct timer{
 	unsigned int const RIS;
 	unsigned int const MIS;
 	unsigned int BGLOAD;
+	unsigned int const reserved0[1];
 	//TImer 2 registers
 	unsigned int T2LOAD;
 	unsigned int const T2VALUE;
@@ -107,10 +108,10 @@ typedef volatile struct timer{
 	unsigned int const T2RIS;
 	unsigned int const T2MIS;
 	unsigned int T2BGLOAD;
-	unsigned int const reserved0[943];
+	unsigned int const reserved1[944];
 	unsigned int ITCR;
 	unsigned int ITOP;
-	unsigned int const reserved1[53];
+	unsigned int const reserved2[54];
 	unsigned int const PERIPHID0;
 	unsigned int const PERIPHID1;
 	unsigned int const PERIPHID2;

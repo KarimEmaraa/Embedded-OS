@@ -6,7 +6,7 @@
 typedef volatile struct uart{
 	unsigned int DR;
 	unsigned int DSR;
-	unsigned char reserved0[16];
+	unsigned int reserved0[4];
 	unsigned int FR;
 	unsigned int const reserved1[1];
 	unsigned int LPR;

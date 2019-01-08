@@ -54,8 +54,9 @@ void uart_rpx(UART_Type *device, int x)
 	if (x){
 		c = tab[x % 16];
 		uart_rpx(device, x / 16);
+		uart_putc(device, c);
 	}
-	uart_putc(device, c);
+	
 }
 
 void uart_printx(UART_Type *device, int x)
@@ -73,10 +74,11 @@ void uart_rpu(UART_Type *device, int x)
 {
 	char c;
   	if (x){
-     c = tab[x % 10];
-     uart_rpu(device, x / 10);
+     		c = tab[x % 10];
+     		uart_rpu(device, x / 10);
+		uart_putc(device, c);
   	}
-  	uart_putc(device, c);
+  	
 }
 
 void uart_printu(UART_Type *device, unsigned int x)

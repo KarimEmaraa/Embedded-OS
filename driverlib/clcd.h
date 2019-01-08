@@ -41,7 +41,7 @@ void clcd_krpx(unsigned int x); //print hex number at current position.
 void clcd_kprintx(unsigned int x); //print hex number in 0x format.
 void clcd_krpu(unsigned int x); //for unsigned number
 void clcd_kprintu(unsigned int x);
-void clcd_kprinti(unsigned int x); //signed number
+void clcd_kprinti(int x); //signed number
 void clcd_kprintf(char * fmt, ...);
 
 
