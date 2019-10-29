@@ -13,9 +13,11 @@ extern unsigned int lock(void);
 void sema_Take(Semaphore * sem)
 {
 	if(sem == 0) return;
+	unsigned int temp;
 	unsigned int ints = lock();
-	sem->value--;
-	if(sem->value < 0)
+	temp = sem->value;
+	unlock(ints);
+	if(temp == 0)
 	{
 		running->tSTATUS = BLOCK;
     	qTask_Enqueue(&sem->queueHead, &sem->queueTail, running);
@@ -23,7 +25,7 @@ void sema_Take(Semaphore * sem)
     	tswitch();
 	}
 
-	unlock(ints);
+	
 }
 
 void sema_Give(Semaphore * sem)
@@ -33,13 +35,14 @@ void sema_Give(Semaphore * sem)
   	unsigned int SR = lock();
 
   	sem->value++;
+	unlock(SR);
 	if (sem->value <= 0){
 		temp = qTask_Dequeue(&sem->queueHead, &sem->queueTail);
 		temp->tSTATUS = READY;
 		qTask_Enqueue(&readyQueue, &tailReadyQueue, temp);
 	  }
 
-  unlock(SR);
+  
 }
 
 unsigned int sema_CreateBinary( Semaphore * sem)
